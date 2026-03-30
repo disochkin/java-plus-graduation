@@ -1,0 +1,27 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432/main_service_db"
+    username: "ewmuser"
+    password: "ewmpass"
+  jpa:
+    hibernate:
+      ddl-auto: none # Отключение автоматического изменения структуры таблиц
+    properties:
+      hibernate:
+        format_sql: true # Форматирует SQL-запросы для удобства чтения
+        show_sql: false # Показывает SQL-запросы в логах
+  data:
+    web:
+      pageable:
+        serialization-mode: via_dto
+  sql:
+    init:
+      mode: always
+logging:
+  level:
+    root: INFO
+    org.zalando.logbook: TRACE

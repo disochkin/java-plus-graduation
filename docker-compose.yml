@@ -1,14 +1,16 @@
 services:
-  stats-server:
-    ports:
-      - "9090:9090"
-
-  stats-db:
-    image: postgres:16.1
-
-  ewm-service:
-    ports:
-      - "8080:8080"
-
   ewm-db:
     image: postgres:16.1
+    container_name: ewm-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=ewmuser
+      - POSTGRES_PASSWORD=ewmpass
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ewmuser -d main_service_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
