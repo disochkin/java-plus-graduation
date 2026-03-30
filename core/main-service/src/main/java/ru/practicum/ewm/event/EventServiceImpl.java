@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.practicum.client.StatClient;
 import ru.practicum.dto.StatsParamDto;
-import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.dto.stat.ViewStatsDto;
 import ru.practicum.ewm.exception.AccessViolationException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -64,7 +64,12 @@ public class EventServiceImpl implements EventService {
         statsParamDto.setIsUnique(true);
 
         try {
-            List<ViewStatsDto> viewStatsDtoList = statClient.getStats(statsParamDto);
+            List<ViewStatsDto> viewStatsDtoList = statClient.getStats(
+                    LocalDateTime.now().minusHours(1).toString(),
+                    LocalDateTime.now().plusHours(1).toString(),
+                    uriList,
+                    true
+            );
             return viewStatsDtoList.stream()
                     .collect(Collectors.toMap(
                             dto -> Long.parseLong(dto.getUri().substring(dto.getUri().lastIndexOf('/') + 1)),

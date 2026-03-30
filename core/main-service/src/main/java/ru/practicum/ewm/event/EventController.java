@@ -6,11 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.client.StatClient;
-import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.ewm.clients.stat.StatClient;
+import ru.practicum.ewm.dto.stat.EndpointHitDto;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.service.RequestService;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -25,12 +24,17 @@ public class EventController {
     private final RequestService requestService;
 
     private void saveHit(HttpServletRequest request) {
+//        statClient.hit(new EndpointHitDto(
+//                "ewm-service",
+//                request.getRequestURI(),
+//                request.getRemoteAddr(),
+//                LocalDateTime.now()
+//        ));
         statClient.hit(new EndpointHitDto(
                 "ewm-service",
                 request.getRequestURI(),
                 request.getRemoteAddr(),
-                LocalDateTime.now()
-        ));
+                LocalDateTime.now()));
     }
 
     @PostMapping("/users/{userId}/events")
