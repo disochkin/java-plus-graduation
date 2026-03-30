@@ -1,7 +1,8 @@
 package ru.practicum.statserver.server;
 
-import ru.practicum.dto.EndpointHitDto;
-import ru.practicum.dto.ViewStatsDto;
+
+import ru.practicum.ewm.dto.stat.EndpointHitDto;
+import ru.practicum.ewm.dto.stat.ViewStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

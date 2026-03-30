@@ -2,7 +2,7 @@ package ru.practicum.statserver.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.ewm.dto.stat.ViewStatsDto;
 import ru.practicum.statserver.model.StatModel;
 
 import java.time.LocalDateTime;
