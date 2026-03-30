@@ -17,7 +17,7 @@ public interface StatClient {
 
     @GetMapping
     List<ViewStatsDto> getStats(@RequestParam(name = "start") String start,
-                                      @RequestParam(name = "end") String end,
-                                      @RequestParam(name = "uris", required = false) List<String> uris,
-                                      @RequestParam(name = "unique", defaultValue = "false", required = false) Boolean unique);
+                                @RequestParam(name = "end") String end,
+                                @RequestParam(name = "uris", required = false) List<String> uris,
+                                @RequestParam(name = "unique", defaultValue = "false", required = false) Boolean unique);
 }
