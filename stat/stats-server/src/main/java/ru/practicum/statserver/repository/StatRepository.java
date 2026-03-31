@@ -12,7 +12,7 @@ import java.util.List;
 public interface StatRepository extends JpaRepository<StatModel, Long> {
 
     @Query("""
-            SELECT new ru.practicum.dto.ViewStatsDto(
+            SELECT new ru.practicum.ewm.dto.stat.ViewStatsDto(
                 s.app,
                 s.uri,
                CASE WHEN :unique = TRUE
@@ -28,7 +28,7 @@ public interface StatRepository extends JpaRepository<StatModel, Long> {
     List<ViewStatsDto> getStatWithoutUris(LocalDateTime start, LocalDateTime end, Boolean unique);
 
     @Query("""
-            SELECT new ru.practicum.dto.ViewStatsDto(
+            SELECT new ru.practicum.ewm.dto.stat.ViewStatsDto(
                 s.app,
                 s.uri,
                CASE WHEN :unique = TRUE

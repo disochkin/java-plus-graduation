@@ -25,12 +25,6 @@ public class EventController {
     private final RequestService requestService;
 
     private void saveHit(HttpServletRequest request) {
-//        statClient.hit(new EndpointHitDto(
-//                "ewm-service",
-//                request.getRequestURI(),
-//                request.getRemoteAddr(),
-//                LocalDateTime.now()
-//        ));
         statClient.hit(new EndpointHitDto(
                 "ewm-service",
                 request.getRequestURI(),
