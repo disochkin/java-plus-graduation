@@ -10,9 +10,9 @@ import ru.practicum.ewm.dto.stat.ViewStatsDto;
 
 import java.util.List;
 
-@FeignClient(name = "stat-server")
+@FeignClient(name = "stats-server")
 public interface StatClient {
-    @PostMapping
+    @PostMapping("/hit")
     void hit(@RequestBody EndpointHitDto endpointHitDto);
 
     @GetMapping
