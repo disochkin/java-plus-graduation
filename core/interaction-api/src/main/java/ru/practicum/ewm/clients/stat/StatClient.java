@@ -15,7 +15,7 @@ public interface StatClient {
     @PostMapping("/hit")
     void hit(@RequestBody EndpointHitDto endpointHitDto);
 
-    @GetMapping
+    @GetMapping("/stats")
     List<ViewStatsDto> getStats(@RequestParam(name = "start") String start,
                                 @RequestParam(name = "end") String end,
                                 @RequestParam(name = "uris", required = false) List<String> uris,
