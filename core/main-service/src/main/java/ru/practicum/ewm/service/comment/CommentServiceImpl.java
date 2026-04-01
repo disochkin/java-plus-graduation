@@ -59,6 +59,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CommentDto update(CommentParam commentParam) {
         log.debug("CommentId = {} update request for eventId = {} by userId = {}: {}",
                 commentParam.getCommentId(), commentParam.getEventId(), commentParam.getUserId(),
@@ -147,6 +148,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+
     public List<CommentDto> findAllByEventId(CommentParam commentParam) {
         log.debug("Comments request for eventId = {}", commentParam.getEventId());
 

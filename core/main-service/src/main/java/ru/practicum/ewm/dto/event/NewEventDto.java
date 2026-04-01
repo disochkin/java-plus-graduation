@@ -14,16 +14,14 @@ import java.time.LocalDateTime;
 @Data
 public class NewEventDto {
     @NotBlank
-    @Size(min = 20)
-    @Size(max = 2000)
+    @Size(min = 20, max = 2000)
     private String annotation;
 
     @NotNull
     private Long category;
 
     @NotBlank
-    @Size(min = 20)
-    @Size(max = 7000)
+    @Size(min = 20, max = 7000)
     private String description;
 
     @NotNull
@@ -43,7 +41,6 @@ public class NewEventDto {
     private boolean requestModeration = true;
 
     @NotBlank
-    @Size(min = 3)
-    @Size(max = 120)
+    @Size(min = 3, max = 120)
     private String title;
 }

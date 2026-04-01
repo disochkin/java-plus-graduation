@@ -1,11 +1,13 @@
 package ru.practicum.ewm.event;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.ewm.model.event.Event;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@UtilityClass
 public class EventSpecification {
     public static Specification<Event> withInitiatorId(EventInitiatorIdFilter f) {
         return Specification
