@@ -20,6 +20,7 @@ import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.comment.CommentRepository;
+import org.springframework.data.domain.Page;
 
 import java.util.HashSet;
 import java.util.List;
@@ -99,18 +100,26 @@ public class CompilationServiceImpl implements CompilationService {
         int page = param.from() / param.size();
         Pageable pageable = PageRequest.of(page, param.size());
 
-        List<Compilation> compilations;
-        if (param.pinned() != null) {
-            compilations = compilationRepository.findByPinned(param.pinned(), pageable);
-        } else {
-            compilations = compilationRepository.findAll(pageable).getContent();
-        }
+        Page<Compilation> compilationPage = param.pinned() != null
+                ? compilationRepository.findByPinned(param.pinned(), pageable)
+                : compilationRepository.findAll(pageable);
+
+        List<Compilation> compilations = compilationPage.getContent();
+        Set<Long> compilationIds = compilations.stream()
+                .map(Compilation::getId)
+                .collect(Collectors.toSet());
+
+        Map<Long, Set<EventShortDto>> eventsByCompilationId =
+                compilationRepository.findAllWithEvents(compilationIds).stream()
+                        .collect(Collectors.toMap(
+                                Compilation::getId,
+                                c -> buildEventShortDtos(c.getEvents())));
 
         return compilations.stream()
-                .map(compilation -> {
-                    Set<EventShortDto> eventShortDtos = buildEventShortDtos(compilation.getEvents());
-                    return CompilationMapper.toDto(compilation, eventShortDtos);
-                })
+                .map(compilation -> CompilationMapper.toDto(
+                        compilation,
+                        eventsByCompilationId.getOrDefault(compilation.getId(), Set.of())
+                ))
                 .toList();
     }
 
