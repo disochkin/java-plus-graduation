@@ -2,6 +2,7 @@ package ru.practicum.ewm.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,6 @@ import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.comment.CommentRepository;
-import org.springframework.data.domain.Page;
 
 import java.util.HashSet;
 import java.util.List;
