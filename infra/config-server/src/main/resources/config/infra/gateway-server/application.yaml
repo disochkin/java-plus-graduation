@@ -11,9 +11,14 @@ spring:
         - id: main_service_route
           uri: lb://main-service
           predicates:
-            - Path=/admin/**, /compilations/**, /users/**, /events/**, /categories/**
+            - Path=/admin/categories/**, /compilations/**,  /events/**, /categories/**, /users/**
 
         - id: stats_service_route
           uri: lb://stats-service
           predicates:
             - Path=/hit/**, /stats/**
+
+        - id: user_service_route
+          uri: lb://user-service
+          predicates:
+            - Path=/admin/users/**, /int/admin/users/**

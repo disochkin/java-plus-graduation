@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.practicum.ewm.clients.stat.StatClient;
+import ru.practicum.ewm.clients.user.UserClient;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.stat.StatsParamDto;
 import ru.practicum.ewm.dto.stat.ViewStatsDto;
+import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.exception.AccessViolationException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -40,7 +42,8 @@ import java.util.stream.Collectors;
 @Service
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
+  //  private final UserRepository userRepository;
+    private final UserClient userClient;
     private final EventMapper eventMapper;
     private final StatClient statClient;
     private final CategoryRepository categoryRepository;
@@ -124,12 +127,12 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     public EventFullDto create(Long userId, NewEventDto newEventDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
+        UserDto userDto = userClient.findByIdInt(userId);
+                //.orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ValidationException("The event date must be at least 2 hours from now");
         }
-        Event savedEvent = eventRepository.save(eventMapper.toEvent(newEventDto, user));
+        Event savedEvent = eventRepository.save(eventMapper.toEvent(newEventDto, userDto));
         return eventMapper.toFullDto(savedEvent, getRequestCount(savedEvent), getViewCount(savedEvent), 0L);
     }
 
@@ -162,9 +165,9 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEventFullDescription(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
-        if (!Objects.equals(event.getInitiator().getId(), userId)) {
+        UserDto userDto = userClient.findByIdInt(userId);
+               // .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
+        if (!Objects.equals(event.getInitiatorId(), userId)) {
             throw new AccessViolationException(String.format("Access denied! User userId=%s is not the creator of the event " +
                     "eventId=%s", userId, eventId));
         }
@@ -186,9 +189,9 @@ public class EventServiceImpl implements EventService {
         if (updateEventRequest.getEventDate() != null && updateEventRequest.getEventDate().isBefore(LocalDateTime.now())) {
             throw new ValidationException("Editing past events is prohibited");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
-        if (!Objects.equals(event.getInitiator().getId(), userId)) {
+        UserDto userDto = userClient.findByIdInt(userId);
+               // .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
+        if (!Objects.equals(event.getInitiatorId(), userId)) {
             throw new AccessViolationException(String.format("Access denied! User userId=%s is not the creator of the event " +
                     "eventId=%s", userId, eventId));
         }
@@ -219,8 +222,8 @@ public class EventServiceImpl implements EventService {
     public List<ParticipationRequestDto> checkUserEventParticipation(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
+        UserDto userDto = userClient.findByIdInt(userId);
+             //   .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
 
         List<Request> requests = requestRepository.findByEventIdAndRequesterId(eventId, userId);
         return requests.stream()
@@ -234,9 +237,9 @@ public class EventServiceImpl implements EventService {
         EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
-        if (!Objects.equals(event.getInitiator().getId(), userId)) {
+        UserDto userDto = userClient.findByIdInt(userId);
+           //     .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId)));
+        if (!Objects.equals(event.getInitiatorId(), userId)) {
             throw new AccessViolationException(String.format("Access denied! User userId=%s is not the creator of the event " +
                     "eventId=%s", userId, eventId));
         }

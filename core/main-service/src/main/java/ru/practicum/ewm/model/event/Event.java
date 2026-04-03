@@ -38,10 +38,8 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initiator")
-    @ToString.Exclude
-    private User initiator;
+    @Column(name = "initiator_id")
+    private Long initiatorId;
 
     // тут пока хз, нужно что-то типа @Embedded, т.к. это связанная сущность, не имеющая смысла без Event
     @Embedded
