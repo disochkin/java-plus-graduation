@@ -9,8 +9,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 @ConfigurationPropertiesScan
 @SpringBootApplication
 @EnableFeignClients(basePackages = "ru.practicum.ewm.clients")
-public class MainApplication {
+public class EventServiceApplication {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MainApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(EventServiceApplication.class, args);
     }
 }

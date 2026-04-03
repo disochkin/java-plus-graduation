@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.user.User;
 
 import java.time.LocalDateTime;
 
@@ -29,10 +28,8 @@ public class Request {
     @ToString.Exclude
     private Event event;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requester_id", nullable = false)
-    @ToString.Exclude
-    private User requester;
+    @Column(name = "requester_id")
+    private Long requesterId;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

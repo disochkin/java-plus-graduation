@@ -16,13 +16,12 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/users")
 @RequiredArgsConstructor
 @Validated
 public class UserController {
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/admin/users")
     public List<UserDto> get(@RequestParam(required = false) List<Long> ids,
                              @RequestParam(defaultValue = "0") Integer from,
                              @RequestParam(defaultValue = "10") Integer size) {
@@ -33,11 +32,16 @@ public class UserController {
         return userService.get(userParam);
     }
 
-    @PostMapping
+    @GetMapping("/int/admin/users/{userId}")
+    public UserDto findByIdInt(@PathVariable @Positive Long userId) {
+        log.info("Internal query GET /admin/users: id = {}", userId);
+        return userService.findById(userId);
+    }
+
+    @PostMapping("/admin/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@RequestBody @Valid NewUserRequest request) {
         log.debug("POST /admin/users: {}", request);
-
         return userService.create(request);
     }
 
@@ -45,7 +49,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable @Positive Long userId) {
         log.debug("DELETE /admin/users/{}", userId);
-
         userService.deleteById(userId);
     }
 }

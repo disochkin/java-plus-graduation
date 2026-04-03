@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.CommentParam;
+import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.exception.AccessViolationException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -16,9 +17,8 @@ import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.mapper.CommentMapper;
 import ru.practicum.ewm.model.comment.Comment;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.user.User;
-import ru.practicum.ewm.repository.UserRepository;
 import ru.practicum.ewm.repository.comment.CommentRepository;
+import ru.practicum.ewm.service.UserLookupFacade;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,20 +29,15 @@ import java.util.Optional;
 @Transactional
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final UserLookupFacade userLookupFacade;
 
     @Override
     public CommentDto create(CommentParam commentParam) {
         log.debug("Comment create request for eventId = {} by userId = {}: {}",
                 commentParam.getEventId(), commentParam.getUserId(), commentParam.getCommentDto());
 
-        Optional<User> maybeUser = userRepository.findById(commentParam.getUserId());
-
-        if (maybeUser.isEmpty()) {
-            log.warn("User with id = {} not found", commentParam.getUserId());
-            throw new NotFoundException(String.format("User with id = %d not found", commentParam.getUserId()));
-        }
+        UserDto userDto = userLookupFacade.findOrThrow(commentParam.getUserId());
 
         Optional<Event> maybeEvent = eventRepository.findById(commentParam.getEventId());
 
@@ -51,7 +46,7 @@ public class CommentServiceImpl implements CommentService {
             throw new NotFoundException(String.format("Event with id = %d not found", commentParam.getEventId()));
         }
 
-        Comment comment = commentRepository.save(CommentMapper.toNewComment(maybeUser.get(),
+        Comment comment = commentRepository.save(CommentMapper.toNewComment(userDto.getId(),
                 maybeEvent.get(), commentParam.getCommentDto()));
 
         log.info("New comment added: {}", comment);
@@ -75,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = maybeComment.get();
         log.debug("Initial comment state: {}", comment);
 
-        if (!comment.getUser().getId().equals(commentParam.getUserId())) {
+        if (!comment.getUserId().equals(commentParam.getUserId())) {
             log.warn("No access to edit comment");
             throw new AccessViolationException("No access to edit comment");
         }
@@ -115,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
                     commentParam.getCommentId(), commentParam.getEventId()));
         }
 
-        if (!comment.getUser().getId().equals(commentParam.getUserId())) {
+        if (!comment.getUserId().equals(commentParam.getUserId())) {
             log.warn("No access to delete comment");
             throw new AccessViolationException("No access to delete comment");
         }

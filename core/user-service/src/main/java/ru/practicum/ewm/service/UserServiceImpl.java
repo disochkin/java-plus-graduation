@@ -12,7 +12,7 @@ import ru.practicum.ewm.dto.user.UserParam;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.UserMapper;
-import ru.practicum.ewm.model.user.User;
+import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.repository.UserRepository;
 
 import java.util.List;
@@ -41,6 +41,14 @@ public class UserServiceImpl implements UserService {
                     .map(UserMapper::toUserDto)
                     .toList();
         }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserDto findById(Long userId) {
+        log.debug("Internal user request: {}", userId);
+        return UserMapper.toUserDto(userRepository.findAllById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId))));
     }
 
     @Override

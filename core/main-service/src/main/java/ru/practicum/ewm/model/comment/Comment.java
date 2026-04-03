@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.user.User;
 
 import java.time.LocalDateTime;
 
@@ -22,10 +21,8 @@ public class Comment {
     @Column(name = "text")
     private String text;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude

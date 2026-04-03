@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.ewm.model.category.Category;
-import ru.practicum.ewm.model.user.User;
 
 import java.time.LocalDateTime;
 
@@ -38,10 +37,8 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "initiator")
-    @ToString.Exclude
-    private User initiator;
+    @Column(name = "initiator_id")
+    private Long initiatorId;
 
     // тут пока хз, нужно что-то типа @Embedded, т.к. это связанная сущность, не имеющая смысла без Event
     @Embedded

@@ -6,17 +6,16 @@ import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.UpdateCommentRequest;
 import ru.practicum.ewm.model.comment.Comment;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.user.User;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommentMapper {
-    public static Comment toNewComment(User user, Event event, CommentDto commentDto) {
+    public static Comment toNewComment(Long userId, Event event, CommentDto commentDto) {
         Comment comment = new Comment();
 
         comment.setText(commentDto.getText());
-        comment.setUser(user);
+        comment.setUserId(userId);
         comment.setEvent(event);
 
         return comment;
@@ -27,7 +26,7 @@ public final class CommentMapper {
 
         commentDto.setId(comment.getId());
         commentDto.setText(comment.getText());
-        commentDto.setUserId(comment.getUser().getId());
+        commentDto.setUserId(comment.getUserId());
         commentDto.setEventId(comment.getEvent().getId());
         commentDto.setCreatedOn(comment.getCreatedOn());
         commentDto.setEditedOn(comment.getEditedOn());

@@ -16,9 +16,7 @@ import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.model.event.EventState;
 import ru.practicum.ewm.model.request.Request;
 import ru.practicum.ewm.model.request.RequestStatus;
-import ru.practicum.ewm.model.user.User;
 import ru.practicum.ewm.repository.RequestRepository;
-import ru.practicum.ewm.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,19 +28,15 @@ import java.util.List;
 @Transactional
 public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final UserLookupFacade userLookupFacade;
+
 
     @Override
     @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
         log.debug("Get requests for user with id = {}", userId);
-
-        if (!userRepository.existsById(userId)) {
-            log.warn("User with id = {} not found", userId);
-            throw new NotFoundException(String.format("User with id = %d not found", userId));
-        }
-
+        userLookupFacade.findOrThrow(userId);
         return requestRepository.findByRequesterId(userId).stream()
                 .map(RequestMapper::toDto)
                 .toList();
@@ -51,10 +45,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public ParticipationRequestDto addParticipationRequest(Long userId, Long eventId) {
         log.debug("Add participation request: userId = {}, eventId = {}", userId, eventId);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("User with id = %d not found", userId)));
-
+        userLookupFacade.findOrThrow(userId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Event with id = %d not found", eventId)));
 
@@ -62,7 +53,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Request already exists");
         }
 
-        if (event.getInitiator().getId().equals(userId)) {
+        if (event.getInitiatorId().equals(userId)) {
             throw new ConflictException("Initiator cannot request participation in own event");
         }
 
@@ -80,7 +71,7 @@ public class RequestServiceImpl implements RequestService {
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
         request.setEvent(event);
-        request.setRequester(user);
+        request.setRequesterId(userId);
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
@@ -101,9 +92,7 @@ public class RequestServiceImpl implements RequestService {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException(String.format("Request with id = %d not found", requestId)));
 
-        if (!request.getRequester().getId().equals(userId)) {
-            throw new ConflictException("User is not request owner");
-        }
+        userLookupFacade.findOrThrow(userId);
 
         request.setStatus(RequestStatus.CANCELED);
         requestRepository.save(request);
@@ -120,7 +109,7 @@ public class RequestServiceImpl implements RequestService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Event with id = %d not found", eventId)));
 
-        if (!event.getInitiator().getId().equals(userId)) {
+        if (!event.getInitiatorId().equals(userId)) {
             throw new ConflictException("User is not event initiator");
         }
 
@@ -137,7 +126,7 @@ public class RequestServiceImpl implements RequestService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Event with id = %d not found", eventId)));
 
-        if (!event.getInitiator().getId().equals(userId)) {
+        if (!event.getInitiatorId().equals(userId)) {
             throw new ConflictException("User is not event initiator");
         }
 
