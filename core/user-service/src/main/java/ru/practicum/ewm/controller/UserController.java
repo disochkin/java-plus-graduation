@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.user.NewUserRequest;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.dto.user.UserParam;
+import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.service.UserService;
 
 import java.util.List;
