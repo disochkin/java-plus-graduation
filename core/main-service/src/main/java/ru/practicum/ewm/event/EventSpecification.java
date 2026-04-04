@@ -11,7 +11,7 @@ import java.util.List;
 public class EventSpecification {
     public static Specification<Event> withInitiatorId(EventInitiatorIdFilter f) {
         return Specification
-                .where(initiatorId(f.getInitiator()));
+                .where(initiatorId(f.getInitiatorId()));
     }
 
     public static Specification<Event> withPublicFilter(EventPublicFilter f) {
@@ -74,12 +74,12 @@ public class EventSpecification {
         return (root, query, cb) ->
                 (initiatorIds == null || initiatorIds.isEmpty())
                         ? null
-                        : root.get("initiator").get("id").in(initiatorIds);
+                        : root.get("initiatorId").in(initiatorIds);
     }
 
     public static Specification<Event> initiatorId(Long initiatorId) {
         return (root, query, cb) ->
-                initiatorId == null ? null : cb.equal(root.get("initiator").get("id"), initiatorId);
+                initiatorId == null ? null : cb.equal(root.get("initiatorId"), initiatorId);
     }
 
     public static Specification<Event> states(List<String> states) {

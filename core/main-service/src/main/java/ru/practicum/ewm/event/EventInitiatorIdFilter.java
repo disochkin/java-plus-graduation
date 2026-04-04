@@ -6,7 +6,7 @@ import lombok.Data;
 public class EventInitiatorIdFilter {
     private Long userId;
 
-    public Long getInitiator() {
+    public Long getInitiatorId() {
         return userId;
     }
 }
