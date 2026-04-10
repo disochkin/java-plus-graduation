@@ -1,7 +1,7 @@
 package ru.practicum.ewm.dto.event;
 
 import lombok.Data;
-import ru.practicum.ewm.model.request.RequestUpdateAction;
+import ru.practicum.ewm.dto.request.RequestUpdateAction;
 
 import java.util.List;
 

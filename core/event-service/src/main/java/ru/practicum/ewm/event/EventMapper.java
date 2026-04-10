@@ -3,7 +3,6 @@ package ru.practicum.ewm.event;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.mapper.CategoryMapper;

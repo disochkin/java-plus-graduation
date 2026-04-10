@@ -20,7 +20,6 @@ import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.model.compilation.Compilation;
 import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.repository.CompilationRepository;
-import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.comment.CommentRepository;
 
 import java.util.HashSet;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
-    private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
     private final CommentRepository commentRepository;
     private final RequestClient requestClient;

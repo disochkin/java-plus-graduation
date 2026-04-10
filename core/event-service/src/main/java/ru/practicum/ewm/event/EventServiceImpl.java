@@ -1,6 +1,5 @@
 package ru.practicum.ewm.event;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -8,12 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.practicum.ewm.clients.RequestClient;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
-import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.dto.stat.StatsParamDto;
 import ru.practicum.ewm.dto.stat.ViewStatsDto;
 import ru.practicum.ewm.dto.user.UserDto;
@@ -21,15 +17,11 @@ import ru.practicum.ewm.exception.AccessViolationException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidationException;
-import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.model.category.Category;
 import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.model.event.EventState;
 import ru.practicum.ewm.model.event.Location;
-import ru.practicum.ewm.model.request.Request;
-import ru.practicum.ewm.model.request.RequestStatus;
 import ru.practicum.ewm.repository.CategoryRepository;
-//import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.comment.CommentRepository;
 import ru.practicum.ewm.service.UserLookupFacade;
 
@@ -45,7 +37,6 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final StatClient statClient;
     private final CategoryRepository categoryRepository;
-   // private final RequestRepository requestRepository;
     private final CommentRepository commentRepository;
     private final UserLookupFacade userLookupFacade;
     private final RequestClient requestClient;

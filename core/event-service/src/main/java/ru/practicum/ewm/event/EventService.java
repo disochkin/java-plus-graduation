@@ -2,7 +2,6 @@ package ru.practicum.ewm.event;
 
 import org.springframework.data.domain.Pageable;
 import ru.practicum.ewm.dto.event.*;
-import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 
 import java.util.Collection;
 import java.util.List;

@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
-import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.dto.stat.EndpointHitDto;
-import ru.practicum.ewm.service.RequestService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -23,7 +21,6 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
     private final StatClient statClient;
-    private final RequestService requestService;
 
     private void saveHit(HttpServletRequest request) {
         statClient.hit(new EndpointHitDto(
@@ -73,27 +70,6 @@ public class EventController {
         log.debug("EVENTS: {}", eventFullDto);
         return eventFullDto;
     }
-
-//    @GetMapping("/users/{userId}/events/{eventId}/requests")
-//    public List<ParticipationRequestDto> checkUserEventParticipation(@PathVariable Long userId,
-//                                                                     @PathVariable Long eventId) {
-//        log.info("User event participation request, userId={}, eventId={}", userId, eventId);
-//        List<ParticipationRequestDto> participationRequestDto = eventService.getEventParticipants(userId, eventId);
-//        log.debug("EVENTS: {}", participationRequestDto);
-//        return participationRequestDto;
-//    }
-
-//    @PatchMapping("/users/{userId}/events/{eventId}/requests")
-//    public EventRequestStatusUpdateResult changeStatusRequest(@PathVariable Long userId,
-//                                                              @PathVariable Long eventId,
-//                                                              @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-//        log.info("Request to change the status of event participation eventId={}, user userId={}", eventId, userId);
-//        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = requestService.changeRequestStatus(userId,
-//                eventId,
-//                eventRequestStatusUpdateRequest);
-//        log.debug("EVENTS: {}", eventRequestStatusUpdateResult);
-//        return eventRequestStatusUpdateResult;
-//    }
 
     @PatchMapping("/admin/events/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
