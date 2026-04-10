@@ -24,4 +24,5 @@ spring:
 logging:
   level:
     root: INFO
+    ru.practicum.ewm: DEBUG
     org.zalando.logbook: TRACE

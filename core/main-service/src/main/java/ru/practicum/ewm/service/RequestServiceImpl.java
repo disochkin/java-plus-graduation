@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.dto.event.EventRequestStatusUpdateResult;
-import ru.practicum.ewm.dto.event.ParticipationRequestDto;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -31,76 +31,6 @@ public class RequestServiceImpl implements RequestService {
     private final EventRepository eventRepository;
     private final UserLookupFacade userLookupFacade;
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ParticipationRequestDto> getUserRequests(Long userId) {
-        log.debug("Get requests for user with id = {}", userId);
-        userLookupFacade.findOrThrow(userId);
-        return requestRepository.findByRequesterId(userId).stream()
-                .map(RequestMapper::toDto)
-                .toList();
-    }
-
-    @Override
-    public ParticipationRequestDto addParticipationRequest(Long userId, Long eventId) {
-        log.debug("Add participation request: userId = {}, eventId = {}", userId, eventId);
-        userLookupFacade.findOrThrow(userId);
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format("Event with id = %d not found", eventId)));
-
-        if (requestRepository.findByRequesterIdAndEventId(userId, eventId).isPresent()) {
-            throw new ConflictException("Request already exists");
-        }
-
-        if (event.getInitiatorId().equals(userId)) {
-            throw new ConflictException("Initiator cannot request participation in own event");
-        }
-
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException("Event is not published");
-        }
-
-        if (event.getParticipantLimit() > 0) {
-            Long confirmedCount = requestRepository.countConfirmedRequestsByEventId(eventId);
-            if (confirmedCount >= event.getParticipantLimit()) {
-                throw new ConflictException("Participant limit reached");
-            }
-        }
-
-        Request request = new Request();
-        request.setCreated(LocalDateTime.now());
-        request.setEvent(event);
-        request.setRequesterId(userId);
-
-        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
-            request.setStatus(RequestStatus.CONFIRMED);
-        } else {
-            request.setStatus(RequestStatus.PENDING);
-        }
-
-        Request savedRequest = requestRepository.save(request);
-        log.info("Request created: {}", savedRequest);
-
-        return RequestMapper.toDto(savedRequest);
-    }
-
-    @Override
-    public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
-        log.debug("Cancel request: userId = {}, requestId = {}", userId, requestId);
-
-        Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new NotFoundException(String.format("Request with id = %d not found", requestId)));
-
-        userLookupFacade.findOrThrow(userId);
-
-        request.setStatus(RequestStatus.CANCELED);
-        requestRepository.save(request);
-        log.info("Request cancelled: {}", request);
-
-        return RequestMapper.toDto(request);
-    }
-
     @Override
     @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getEventParticipants(Long userId, Long eventId) {
@@ -112,6 +42,7 @@ public class RequestServiceImpl implements RequestService {
         if (!event.getInitiatorId().equals(userId)) {
             throw new ConflictException("User is not event initiator");
         }
+
 
         return requestRepository.findByEventId(eventId).stream()
                 .map(RequestMapper::toDto)

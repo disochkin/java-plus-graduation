@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import ru.practicum.ewm.clients.RequestClient;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.dto.stat.StatsParamDto;
 import ru.practicum.ewm.dto.stat.ViewStatsDto;
 import ru.practicum.ewm.dto.user.UserDto;
@@ -27,7 +29,7 @@ import ru.practicum.ewm.model.event.Location;
 import ru.practicum.ewm.model.request.Request;
 import ru.practicum.ewm.model.request.RequestStatus;
 import ru.practicum.ewm.repository.CategoryRepository;
-import ru.practicum.ewm.repository.RequestRepository;
+//import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.repository.comment.CommentRepository;
 import ru.practicum.ewm.service.UserLookupFacade;
 
@@ -43,10 +45,10 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final StatClient statClient;
     private final CategoryRepository categoryRepository;
-    private final RequestRepository requestRepository;
+   // private final RequestRepository requestRepository;
     private final CommentRepository commentRepository;
     private final UserLookupFacade userLookupFacade;
-
+    private final RequestClient requestClient;
 
     private Map<Long, Long> getViews(List<Event> events) {
         if (events == null || events.isEmpty()) {
@@ -97,14 +99,10 @@ public class EventServiceImpl implements EventService {
             return Map.of();
         }
 
-        List<Object[]> raw = requestRepository.countConfirmedRequestsByEventIds(
+        return requestClient.getConfirmedRequest(
                 events.stream().map(Event::getId).toList()
         );
-        return raw.stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
+
     }
 
     private Map<Long, Boolean> checkAvailable(List<Event> events, Map<Long, Long> requestMap) {
@@ -130,7 +128,7 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException("The event date must be at least 2 hours from now");
         }
         Event savedEvent = eventRepository.save(eventMapper.toEvent(newEventDto, userDto));
-        return eventMapper.toFullDto(savedEvent, getRequestCount(savedEvent), getViewCount(savedEvent), 0L);
+        return eventMapper.toFullDto(savedEvent, 0L, 0L, 0L);
     }
 
     @Transactional(readOnly = true)
@@ -140,7 +138,8 @@ public class EventServiceImpl implements EventService {
         Page<Event> events = eventRepository.findAll(spec, pageable);
 
         Map<Long, Long> viewsMap = getViews(events.getContent());
-        Map<Long, Long> requestsMap = getRequests(events.getContent());
+
+        Map<Long, Long> requestsMap = requestClient.getConfirmedRequest(events.stream().map(Event::getId).toList());
         Map<Long, Long> commentsMap = commentRepository.countByEventIdIn(events.stream()
                         .map(Event::getId).toList()).stream()
                 .collect(Collectors.toMap(
@@ -214,54 +213,54 @@ public class EventServiceImpl implements EventService {
                 commentRepository.countByEventId(eventId));
     }
 
-    public List<ParticipationRequestDto> checkUserEventParticipation(Long userId, Long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
-        userLookupFacade.findOrThrow(userId);
+//    public List<ParticipationRequestDto> checkUserEventParticipation(Long userId, Long eventId) {
+//        Event event = eventRepository.findById(eventId)
+//                .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
+//        userLookupFacade.findOrThrow(userId);
+//
+//        List<Request> requests = requestRepository.findByEventIdAndRequesterId(eventId, userId);
+//        return requests.stream()
+//                .map(RequestMapper::toDto)
+//                .toList();
+//    }
 
-        List<Request> requests = requestRepository.findByEventIdAndRequesterId(eventId, userId);
-        return requests.stream()
-                .map(RequestMapper::toDto)
-                .toList();
-    }
-
-    public EventRequestStatusUpdateResult changeStatusRequest(@PathVariable Long userId,
-                                                              @PathVariable Long eventId,
-                                                              @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
-        userLookupFacade.findOrThrow(userId);
-        if (!Objects.equals(event.getInitiatorId(), userId)) {
-            throw new AccessViolationException(String.format("Access denied! User userId=%s is not the creator of the event " +
-                    "eventId=%s", userId, eventId));
-        }
-        List<Request> requestList = requestRepository.findAllByIdInOrderByCreated(eventRequestStatusUpdateRequest.getRequestIds());
-        RuntimeException ex = null;
-        for (Request request : requestList) {
-            if (request.getStatus() != RequestStatus.PENDING) {
-                ex = new ValidationException("Request must have status PENDING");
-            }
-            Long confirmedRequest = getRequestCount(event);
-            if (confirmedRequest < event.getParticipantLimit()) {
-                switch (eventRequestStatusUpdateRequest.getStatus()) {
-                    case CONFIRMED -> request.setStatus(RequestStatus.CONFIRMED);
-                    case REJECTED -> request.setStatus(RequestStatus.REJECTED);
-                    default -> throw new ValidationException(
-                            "Unexpected status: " + eventRequestStatusUpdateRequest.getStatus()
-                    );
-                }
-                eventRequestStatusUpdateResult.getConfirmedRequests().add(RequestMapper.toDto(request));
-            } else {
-                request.setStatus(RequestStatus.CANCELED);
-                eventRequestStatusUpdateResult.getRejectedRequests().add(RequestMapper.toDto(request));
-                ex = (ex == null) ? new ConflictException("The participant limit has been reached") : ex;
-            }
-            requestRepository.save(request);
-        }
-        if (ex != null) throw ex;
-        return eventRequestStatusUpdateResult;
-    }
+//    public EventRequestStatusUpdateResult changeStatusRequest(@PathVariable Long userId,
+//                                                              @PathVariable Long eventId,
+//                                                              @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+//        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();
+//        Event event = eventRepository.findById(eventId)
+//                .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
+//        userLookupFacade.findOrThrow(userId);
+//        if (!Objects.equals(event.getInitiatorId(), userId)) {
+//            throw new AccessViolationException(String.format("Access denied! User userId=%s is not the creator of the event " +
+//                    "eventId=%s", userId, eventId));
+//        }
+//        List<Request> requestList = requestRepository.findAllByIdInOrderByCreated(eventRequestStatusUpdateRequest.getRequestIds());
+//        RuntimeException ex = null;
+//        for (Request request : requestList) {
+//            if (request.getStatus() != RequestStatus.PENDING) {
+//                ex = new ValidationException("Request must have status PENDING");
+//            }
+//            Long confirmedRequest = getRequestCount(event);
+//            if (confirmedRequest < event.getParticipantLimit()) {
+//                switch (eventRequestStatusUpdateRequest.getStatus()) {
+//                    case CONFIRMED -> request.setStatus(RequestStatus.CONFIRMED);
+//                    case REJECTED -> request.setStatus(RequestStatus.REJECTED);
+//                    default -> throw new ValidationException(
+//                            "Unexpected status: " + eventRequestStatusUpdateRequest.getStatus()
+//                    );
+//                }
+//                eventRequestStatusUpdateResult.getConfirmedRequests().add(RequestMapper.toDto(request));
+//            } else {
+//                request.setStatus(RequestStatus.CANCELED);
+//                eventRequestStatusUpdateResult.getRejectedRequests().add(RequestMapper.toDto(request));
+//                ex = (ex == null) ? new ConflictException("The participant limit has been reached") : ex;
+//            }
+//            requestRepository.save(request);
+//        }
+//        if (ex != null) throw ex;
+//        return eventRequestStatusUpdateResult;
+//    }
 
     @Transactional
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventRequest) {
@@ -387,4 +386,13 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toFullDto(event, getRequestCount(event), getViewCount(event),
                 commentRepository.countByEventId(eventId));
     }
+
+    @Transactional(readOnly = true)
+    public EventClientDto getEventInt(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
+
+        return eventMapper.toEventClientDto(event);
+    }
+
 }

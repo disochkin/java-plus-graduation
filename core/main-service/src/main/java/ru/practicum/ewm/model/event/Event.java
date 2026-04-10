@@ -40,7 +40,6 @@ public class Event {
     @Column(name = "initiator_id")
     private Long initiatorId;
 
-    // тут пока хз, нужно что-то типа @Embedded, т.к. это связанная сущность, не имеющая смысла без Event
     @Embedded
     private Location location;
 
@@ -58,7 +57,7 @@ public class Event {
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
-    private EventState state = EventState.PENDING; // подумать насчёт PENDING
+    private EventState state = EventState.PENDING;
 
     @Column(name = "title")
     private String title;

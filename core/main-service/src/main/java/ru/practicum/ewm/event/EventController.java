@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.dto.stat.EndpointHitDto;
 import ru.practicum.ewm.service.RequestService;
 
@@ -73,26 +74,26 @@ public class EventController {
         return eventFullDto;
     }
 
-    @GetMapping("/users/{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> checkUserEventParticipation(@PathVariable Long userId,
-                                                                     @PathVariable Long eventId) {
-        log.info("User event participation request, userId={}, eventId={}", userId, eventId);
-        List<ParticipationRequestDto> participationRequestDto = requestService.getEventParticipants(userId, eventId);
-        log.debug("EVENTS: {}", participationRequestDto);
-        return participationRequestDto;
-    }
+//    @GetMapping("/users/{userId}/events/{eventId}/requests")
+//    public List<ParticipationRequestDto> checkUserEventParticipation(@PathVariable Long userId,
+//                                                                     @PathVariable Long eventId) {
+//        log.info("User event participation request, userId={}, eventId={}", userId, eventId);
+//        List<ParticipationRequestDto> participationRequestDto = eventService.getEventParticipants(userId, eventId);
+//        log.debug("EVENTS: {}", participationRequestDto);
+//        return participationRequestDto;
+//    }
 
-    @PatchMapping("/users/{userId}/events/{eventId}/requests")
-    public EventRequestStatusUpdateResult changeStatusRequest(@PathVariable Long userId,
-                                                              @PathVariable Long eventId,
-                                                              @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        log.info("Request to change the status of event participation eventId={}, user userId={}", eventId, userId);
-        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = requestService.changeRequestStatus(userId,
-                eventId,
-                eventRequestStatusUpdateRequest);
-        log.debug("EVENTS: {}", eventRequestStatusUpdateResult);
-        return eventRequestStatusUpdateResult;
-    }
+//    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+//    public EventRequestStatusUpdateResult changeStatusRequest(@PathVariable Long userId,
+//                                                              @PathVariable Long eventId,
+//                                                              @Valid @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+//        log.info("Request to change the status of event participation eventId={}, user userId={}", eventId, userId);
+//        EventRequestStatusUpdateResult eventRequestStatusUpdateResult = requestService.changeRequestStatus(userId,
+//                eventId,
+//                eventRequestStatusUpdateRequest);
+//        log.debug("EVENTS: {}", eventRequestStatusUpdateResult);
+//        return eventRequestStatusUpdateResult;
+//    }
 
     @PatchMapping("/admin/events/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
@@ -130,5 +131,13 @@ public class EventController {
         log.info("client ip: {}", request.getRemoteAddr());
         saveHit(request);
         return eventService.getEvent(eventId);
+    }
+
+    @GetMapping("/int/events/{eventId}")
+    public EventClientDto getEventInt(@PathVariable Long eventId,
+                                      HttpServletRequest request) {
+        log.info("Internal request for detailed information on the event with id: {}", eventId);
+        saveHit(request);
+        return eventService.getEventInt(eventId);
     }
 }

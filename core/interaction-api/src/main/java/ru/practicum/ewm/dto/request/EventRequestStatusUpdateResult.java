@@ -1,7 +1,6 @@
-package ru.practicum.ewm.dto.event;
+package ru.practicum.ewm.dto.request;
 
 import lombok.Data;
-import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 
 import java.util.ArrayList;
 import java.util.List;

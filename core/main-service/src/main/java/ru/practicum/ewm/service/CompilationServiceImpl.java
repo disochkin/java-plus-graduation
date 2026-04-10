@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.clients.RequestClient;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.CompilationParam;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
@@ -38,6 +39,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final RequestRepository requestRepository;
     private final EventMapper eventMapper;
     private final CommentRepository commentRepository;
+    private final RequestClient requestClient;
 
     @Override
     public CompilationDto create(NewCompilationDto request) {
@@ -143,12 +145,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Long> eventIds = events.stream()
                 .map(Event::getId)
                 .toList();
-        Map<Long, Long> confirmedRequestsMap = requestRepository.countConfirmedRequestsByEventIds(eventIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        result -> (Long) result[0],
-                        result -> (Long) result[1]
-                ));
+        Map<Long, Long> confirmedRequestsMap = requestClient.getConfirmedRequest(eventIds);
         Map<Long, Long> commentsMap = commentRepository.countByEventIdIn(events.stream()
                         .map(Event::getId).toList()).stream()
                 .collect(Collectors.toMap(

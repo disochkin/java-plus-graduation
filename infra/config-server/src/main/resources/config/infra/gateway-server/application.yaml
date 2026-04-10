@@ -17,10 +17,15 @@ spring:
         locator:
           enabled: true
       routes:
+        - id: request_service_route
+          uri: lb://request-service
+          predicates:
+            - Path=/users/*/requests/**, /users/*/events/*/requests, /int/requests/**
+
         - id: main_service_route
           uri: lb://main-service
           predicates:
-            - Path=/admin/categories/**, /admin/compilations/**, /compilations/**, /events/**, /categories/**, /users/**, /users/{userId}/requests, /admin/events/**
+            - Path=/int/events/**, /users/*/events/**, /admin/categories/**, /admin/compilations/**, /compilations/**, /events/**, /categories/**, /admin/events/**
 
         - id: stats_service_route
           uri: lb://stats-service
@@ -31,3 +36,4 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/admin/users/**, /int/admin/users/**
+

@@ -3,16 +3,15 @@ package ru.practicum.ewm.event;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.practicum.ewm.dto.event.EventFullDto;
-import ru.practicum.ewm.dto.event.EventShortDto;
-import ru.practicum.ewm.dto.event.LocationDto;
-import ru.practicum.ewm.dto.event.NewEventDto;
+import ru.practicum.ewm.dto.category.CategoryDto;
+import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.model.category.Category;
 import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.model.event.Location;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = CategoryMapper.class)
 public interface EventMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -44,5 +43,8 @@ public interface EventMapper {
     EventFullDto toFullDto(Event event, Long requests, Long views, Long comments);
 
     Location toLocation(LocationDto locationDto);
+
+    @Mapping(target = "category", source = "category")
+    EventClientDto toEventClientDto(Event event);
 }
 

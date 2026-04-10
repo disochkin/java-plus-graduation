@@ -2,7 +2,7 @@ package ru.practicum.ewm.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewm.dto.event.ParticipationRequestDto;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.model.request.Request;
 
 import java.time.format.DateTimeFormatter;

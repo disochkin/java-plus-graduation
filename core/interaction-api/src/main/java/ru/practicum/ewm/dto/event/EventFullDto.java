@@ -11,15 +11,13 @@ import java.time.LocalDateTime;
 
 @Data
 public class EventFullDto {
-    private Long id;
-
     @NotBlank
     private String annotation;
 
     @NotNull
     private CategoryDto category;
 
-    private Long confirmedRequests;
+    private Long confirmedRequests; // дорасчёт, в базе не хранится
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
@@ -30,8 +28,10 @@ public class EventFullDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
+    private Long id;
+
     @NotNull
-    private UserShortDto initiator;
+    private Long initiator;
 
     @NotNull
     private LocationDto location;
@@ -46,12 +46,12 @@ public class EventFullDto {
 
     private boolean requestModeration = true;
 
-    private String state;
+    private EventState state;
 
     @NotBlank
     private String title;
 
-    private Long views;
+    private Long views; // дорасчёт, в базе не хранится
 
     private Long comments;
 }
