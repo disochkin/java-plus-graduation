@@ -1,4 +1,4 @@
-package ru.practicum.ewm.service.comment;
+package ru.practicum.ewm.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,18 +7,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.clients.EventLookupFacade;
+import ru.practicum.ewm.clients.UserLookupFacade;
 import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.CommentParam;
+import ru.practicum.ewm.dto.event.EventClientDto;
 import ru.practicum.ewm.dto.user.UserClientDto;
-import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.exception.AccessViolationException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.mapper.CommentMapper;
-import ru.practicum.ewm.model.comment.Comment;
-import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.repository.comment.CommentRepository;
-import ru.practicum.ewm.service.UserLookupFacade;
+import ru.practicum.ewm.model.Comment;
+import ru.practicum.ewm.repository.CommentRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +29,7 @@ import java.util.Optional;
 @Transactional
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-    private final EventRepository eventRepository;
+    private final EventLookupFacade eventLookupFacade;
     private final UserLookupFacade userLookupFacade;
 
     @Override
@@ -39,15 +39,10 @@ public class CommentServiceImpl implements CommentService {
 
         UserClientDto userClientDto = userLookupFacade.findOrThrow(commentParam.getUserId());
 
-        Optional<Event> maybeEvent = eventRepository.findById(commentParam.getEventId());
-
-        if (maybeEvent.isEmpty()) {
-            log.warn("Event with id = {} not found", commentParam.getEventId());
-            throw new NotFoundException(String.format("Event with id = %d not found", commentParam.getEventId()));
-        }
+        EventClientDto eventClientDto = eventLookupFacade.findOrThrow(commentParam.getEventId());
 
         Comment comment = commentRepository.save(CommentMapper.toNewComment(userClientDto.getId(),
-                maybeEvent.get(), commentParam.getCommentDto()));
+                eventClientDto, commentParam.getCommentDto()));
 
         log.info("New comment added: {}", comment);
         return CommentMapper.toCommentDto(comment);
@@ -75,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
             throw new AccessViolationException("No access to edit comment");
         }
 
-        if (!commentParam.getEventId().equals(comment.getEvent().getId())) {
+        if (!commentParam.getEventId().equals(comment.getEventId())) {
             log.warn("Comment with id = {} doesn't belong to event with id = {}",
                     commentParam.getCommentId(), commentParam.getEventId());
             throw new ValidationException(String.format("Comment with id = %d doesn't belong to event with id = %d",
@@ -103,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = maybeComment.get();
 
-        if (!commentParam.getEventId().equals(comment.getEvent().getId())) {
+        if (!commentParam.getEventId().equals(comment.getEventId())) {
             log.warn("Comment with id = {} doesn't belong to event with id = {}",
                     commentParam.getCommentId(), commentParam.getEventId());
             throw new ValidationException(String.format("Comment with id = %d doesn't belong to event with id = %d",
@@ -132,7 +127,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = maybeComment.get();
 
-        if (!eventId.equals(comment.getEvent().getId())) {
+        if (!eventId.equals(comment.getEventId())) {
             log.warn("Comment with id = {} doesn't belong to event with id = {}", commentId, eventId);
             throw new ValidationException(String.format("Comment with id = %d doesn't belong to event with id = %d",
                     commentId, eventId));
@@ -147,10 +142,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentDto> findAllByEventId(CommentParam commentParam) {
         log.debug("Comments request for eventId = {}", commentParam.getEventId());
 
-        if (!eventRepository.existsById(commentParam.getEventId())) {
-            log.warn("Event with id = {} not found", commentParam.getEventId());
-            throw new NotFoundException(String.format("Event with id = %d not found", commentParam.getEventId()));
-        }
+        eventLookupFacade.findOrThrow(commentParam.getEventId());
 
         int page = commentParam.getFrom() / commentParam.getSize();
         Sort sort = Sort.by("createdOn").ascending();

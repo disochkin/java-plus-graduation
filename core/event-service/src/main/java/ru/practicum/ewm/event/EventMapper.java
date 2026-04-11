@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.practicum.ewm.dto.event.*;
-import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.dto.user.UserClientDto;
 import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.model.category.Category;
 import ru.practicum.ewm.model.event.Event;
@@ -14,13 +14,13 @@ import ru.practicum.ewm.model.event.Location;
 public interface EventMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "initiatorId", source = "userDto.id")
+    @Mapping(target = "initiatorId", source = "userClientDto.id")
     @Mapping(target = "location", source = "newEventDto.location")
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "category", source = "newEventDto.category", qualifiedByName = "categoryFromId")
-    Event toEvent(NewEventDto newEventDto, UserDto userDto);
+    Event toEvent(NewEventDto newEventDto, UserClientDto userClientDto);
 
     @Named("categoryFromId")
     default Category categoryFromId(Long id) {

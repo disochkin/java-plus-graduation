@@ -37,3 +37,14 @@ spring:
           predicates:
             - Path=/admin/users/**, /int/admin/users/**
 
+        - id: comment_service_route
+          uri: lb://comment-service
+          predicates:
+            - Path=/admin/comments/**,/users/*/comments/**,/users/*/events/*/comments/**,/events/*/comments/**
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG

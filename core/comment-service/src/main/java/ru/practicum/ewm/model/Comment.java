@@ -1,0 +1,33 @@
+package ru.practicum.ewm.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "comments")
+@Getter
+@Setter
+@ToString
+public class Comment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "text")
+    private String text;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "event_id")
+    private Long eventId;
+
+    @Column(name = "created_on")
+    private LocalDateTime createdOn = LocalDateTime.now();
+
+    @Column(name = "edited_on")
+    private LocalDateTime editedOn = null;
+}

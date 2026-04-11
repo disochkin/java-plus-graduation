@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.practicum.ewm.dto.user.NewUserRequest;
-import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.dto.user.UserClientDto;
 import ru.practicum.ewm.dto.user.UserParam;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<UserDto> get(UserParam userParam) {
+    public List<UserClientDto> get(UserParam userParam) {
         log.debug("Get user request: {}", userParam);
 
         if (userParam.hasIds()) {
@@ -46,14 +46,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserDto findById(Long userId) {
+    public UserClientDto findById(Long userId) {
         log.debug("Internal user request: {}", userId);
         return UserMapper.toUserDto(userRepository.findAllById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User id=%s not found", userId))));
     }
 
     @Override
-    public UserDto create(NewUserRequest request) {
+    public UserClientDto create(NewUserRequest request) {
         log.debug("New user request: {}", request);
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {

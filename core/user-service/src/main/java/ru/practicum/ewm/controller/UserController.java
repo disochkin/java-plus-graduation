@@ -8,9 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.user.NewUserRequest;
-import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.dto.user.UserClientDto;
 import ru.practicum.ewm.dto.user.UserParam;
-import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.service.UserService;
 
 import java.util.List;
@@ -23,9 +22,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/admin/users")
-    public List<UserDto> get(@RequestParam(required = false) List<Long> ids,
-                             @RequestParam(defaultValue = "0") Integer from,
-                             @RequestParam(defaultValue = "10") Integer size) {
+    public List<UserClientDto> get(@RequestParam(required = false) List<Long> ids,
+                                   @RequestParam(defaultValue = "0") Integer from,
+                                   @RequestParam(defaultValue = "10") Integer size) {
         log.debug("GET /admin/users: ids = {}, from = {}, size = {}", ids, from, size);
 
         UserParam userParam = new UserParam(ids, from, size);
@@ -34,14 +33,14 @@ public class UserController {
     }
 
     @GetMapping("/int/admin/users/{userId}")
-    public UserDto findByIdInt(@PathVariable @Positive Long userId) {
+    public UserClientDto findByIdInt(@PathVariable @Positive Long userId) {
         log.info("Internal query GET /admin/users: id = {}", userId);
         return userService.findById(userId);
     }
 
     @PostMapping("/admin/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@RequestBody @Valid NewUserRequest request) {
+    public UserClientDto create(@RequestBody @Valid NewUserRequest request) {
         log.debug("POST /admin/users: {}", request);
         return userService.create(request);
     }

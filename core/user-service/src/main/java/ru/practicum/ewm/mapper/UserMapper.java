@@ -3,7 +3,7 @@ package ru.practicum.ewm.mapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.dto.user.NewUserRequest;
-import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.dto.user.UserClientDto;
 import ru.practicum.ewm.model.User;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -15,11 +15,11 @@ public final class UserMapper {
         return user;
     }
 
-    public static UserDto toUserDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        userDto.setEmail(user.getEmail());
-        return userDto;
+    public static UserClientDto toUserDto(User user) {
+        UserClientDto userClientDto = new UserClientDto();
+        userClientDto.setId(user.getId());
+        userClientDto.setName(user.getName());
+        userClientDto.setEmail(user.getEmail());
+        return userClientDto;
     }
 }
