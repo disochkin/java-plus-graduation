@@ -7,7 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.clients.RequestClient;
+import ru.practicum.ewm.clients.comment.CommentClient;
+import ru.practicum.ewm.clients.request.RequestClient;
+import ru.practicum.ewm.clients.user.UserLookupFacade;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.stat.StatsParamDto;
@@ -22,8 +24,6 @@ import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.model.event.EventState;
 import ru.practicum.ewm.model.event.Location;
 import ru.practicum.ewm.repository.CategoryRepository;
-import ru.practicum.ewm.repository.comment.CommentRepository;
-import ru.practicum.ewm.service.UserLookupFacade;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,7 +37,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final StatClient statClient;
     private final CategoryRepository categoryRepository;
-    private final CommentRepository commentRepository;
+    private final CommentClient commentClient;
     private final UserLookupFacade userLookupFacade;
     private final RequestClient requestClient;
 
@@ -131,12 +131,8 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> viewsMap = getViews(events.getContent());
 
         Map<Long, Long> requestsMap = requestClient.getConfirmedRequest(events.stream().map(Event::getId).toList());
-        Map<Long, Long> commentsMap = commentRepository.countByEventIdIn(events.stream()
-                        .map(Event::getId).toList()).stream()
-                .collect(Collectors.toMap(
-                        result -> (Long) result[0],
-                        result -> (Long) result[1]
-                ));
+        Map<Long, Long> commentsMap = commentClient.countCommentForEvents(events.stream()
+                        .map(Event::getId).toList());
 
         return events.getContent().stream()
                 .map(event -> eventMapper.toShortDto(
@@ -159,7 +155,7 @@ public class EventServiceImpl implements EventService {
         }
 
         return eventMapper.toFullDto(event, getRequestCount(event), getViewCount(event),
-                commentRepository.countByEventId(eventId));
+                commentClient.countCommentForEvents(List.of(eventId)).get(0));
     }
 
     @Transactional
@@ -201,7 +197,7 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
 
         return eventMapper.toFullDto(event, getRequestCount(event), getViewCount(event),
-                commentRepository.countByEventId(eventId));
+                commentClient.countCommentForEvents(List.of(eventId)).getOrDefault(eventId,0L));
     }
 
     @Transactional
@@ -244,7 +240,7 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
 
         return eventMapper.toFullDto(event, getRequestCount(event), getViewCount(event),
-                commentRepository.countByEventId(eventId));
+                commentClient.countCommentForEvents(List.of(eventId)).getOrDefault(eventId, 0L));
     }
 
     @Transactional(readOnly = true)
@@ -256,12 +252,8 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> requestsMap = getRequests(events);
         log.debug("requestsMap: {}", requestsMap);
         Map<Long, Long> viewsMap = getViews(events);
-        Map<Long, Long> commentsMap = commentRepository.countByEventIdIn(events.stream()
-                        .map(Event::getId).toList()).stream()
-                .collect(Collectors.toMap(
-                        result -> (Long) result[0],
-                        result -> (Long) result[1]
-                ));
+        Map<Long, Long> commentsMap = commentClient.countCommentForEvents(events.stream()
+                        .map(Event::getId).toList());
 
         return events.stream()
                 .map(event -> eventMapper.toFullDto(
@@ -293,12 +285,8 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> requestsMap = getRequests(events);
         Map<Long, Long> viewsMap = getViews(events);
         Map<Long, Boolean> availableMap = checkAvailable(events, requestsMap);
-        Map<Long, Long> commentsMap = commentRepository.countByEventIdIn(events.stream()
-                        .map(Event::getId).toList()).stream()
-                .collect(Collectors.toMap(
-                        result -> (Long) result[0],
-                        result -> (Long) result[1]
-                ));
+        Map<Long, Long> commentsMap = commentClient.countCommentForEvents(events.stream()
+                        .map(Event::getId).toList());
 
         if (eventPublicFilter.getOnlyAvailable() == true) {
             events = events.stream()
@@ -326,7 +314,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
 
         return eventMapper.toFullDto(event, getRequestCount(event), getViewCount(event),
-                commentRepository.countByEventId(eventId));
+                commentClient.countCommentForEvents(List.of(eventId)).getOrDefault(eventId, 0L));
     }
 
     @Transactional(readOnly = true)

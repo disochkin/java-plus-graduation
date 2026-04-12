@@ -7,7 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.clients.RequestClient;
+import ru.practicum.ewm.clients.comment.CommentClient;
+import ru.practicum.ewm.clients.request.RequestClient;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.CompilationParam;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
@@ -20,7 +21,6 @@ import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.model.compilation.Compilation;
 import ru.practicum.ewm.model.event.Event;
 import ru.practicum.ewm.repository.CompilationRepository;
-import ru.practicum.ewm.repository.comment.CommentRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,8 +36,8 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final CommentRepository commentRepository;
     private final RequestClient requestClient;
+    private final CommentClient commentClient;
 
     @Override
     public CompilationDto create(NewCompilationDto request) {
@@ -144,12 +144,8 @@ public class CompilationServiceImpl implements CompilationService {
                 .map(Event::getId)
                 .toList();
         Map<Long, Long> confirmedRequestsMap = requestClient.getConfirmedRequest(eventIds);
-        Map<Long, Long> commentsMap = commentRepository.countByEventIdIn(events.stream()
-                        .map(Event::getId).toList()).stream()
-                .collect(Collectors.toMap(
-                        result -> (Long) result[0],
-                        result -> (Long) result[1]
-                ));
+        Map<Long, Long> commentsMap = commentClient.countCommentForEvents(events.stream()
+                        .map(Event::getId).toList());
 
         return events.stream()
                 .map(event -> {

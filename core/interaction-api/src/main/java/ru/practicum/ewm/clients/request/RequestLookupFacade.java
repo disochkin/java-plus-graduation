@@ -1,4 +1,4 @@
-package ru.practicum.ewm.clients;
+package ru.practicum.ewm.clients.request;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;

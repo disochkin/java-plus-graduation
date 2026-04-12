@@ -1,9 +1,8 @@
-package ru.practicum.ewm.service;
+package ru.practicum.ewm.clients.user;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.clients.user.UserClient;
 import ru.practicum.ewm.dto.user.UserClientDto;
 import ru.practicum.ewm.exception.NotFoundException;
 

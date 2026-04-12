@@ -40,7 +40,7 @@ spring:
         - id: comment_service_route
           uri: lb://comment-service
           predicates:
-            - Path=/admin/comments/**,/users/*/comments/**,/users/*/events/*/comments/**,/events/*/comments/**
+            - Path=/admin/comments/**,/users/*/comments/**,/users/*/events/*/comments/**,/events/*/comments/**,/int/comments
 
 logging:
   level:

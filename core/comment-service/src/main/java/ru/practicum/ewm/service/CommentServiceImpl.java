@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.clients.EventLookupFacade;
-import ru.practicum.ewm.clients.UserLookupFacade;
+import ru.practicum.ewm.clients.event.EventLookupFacade;
+import ru.practicum.ewm.clients.user.UserLookupFacade;
 import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.CommentParam;
 import ru.practicum.ewm.dto.event.EventClientDto;
@@ -21,7 +21,9 @@ import ru.practicum.ewm.model.Comment;
 import ru.practicum.ewm.repository.CommentRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -154,4 +156,14 @@ public class CommentServiceImpl implements CommentService {
                 .map(CommentMapper::toCommentDto)
                 .toList();
     }
+
+    public  Map<Long, Long> countCommentForEvents(List<Long> eventIds) {
+        log.debug("Count comments request for eventIds = {}", eventIds);
+        return commentRepository.countByEventIdIn(eventIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+    }
+
 }

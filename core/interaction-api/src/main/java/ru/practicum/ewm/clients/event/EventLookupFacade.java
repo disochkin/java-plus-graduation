@@ -1,9 +1,8 @@
-package ru.practicum.ewm.clients;
+package ru.practicum.ewm.clients.event;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.clients.event.EventClient;
 import ru.practicum.ewm.dto.event.EventClientDto;
 import ru.practicum.ewm.exception.NotFoundException;
 
