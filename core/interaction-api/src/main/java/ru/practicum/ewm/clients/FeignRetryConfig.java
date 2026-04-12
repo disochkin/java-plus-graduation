@@ -11,6 +11,6 @@ public class FeignRetryConfig {
 
     @Bean
     public Retryer retryer() {
-        return new Retryer.Default(100, TimeUnit.SECONDS.toMillis(2), 3);
+        return new Retryer.Default(100, TimeUnit.SECONDS.toMillis(5), 10);
     }
 }
