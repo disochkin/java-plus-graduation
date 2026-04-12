@@ -8,7 +8,7 @@ import ru.practicum.ewm.clients.FeignRetryConfig;
 import ru.practicum.ewm.dto.event.EventClientDto;
 
 
-@FeignClient(name = "main-service",
+@FeignClient(name = "event-service",
         configuration = FeignRetryConfig.class,
         fallback = EventClientFallback.class)
 
