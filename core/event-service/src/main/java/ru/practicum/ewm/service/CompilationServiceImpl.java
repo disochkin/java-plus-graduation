@@ -145,7 +145,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .toList();
         Map<Long, Long> confirmedRequestsMap = requestClient.getConfirmedRequest(eventIds);
         Map<Long, Long> commentsMap = commentClient.countCommentForEvents(events.stream()
-                        .map(Event::getId).toList());
+                .map(Event::getId).toList());
 
         return events.stream()
                 .map(event -> {

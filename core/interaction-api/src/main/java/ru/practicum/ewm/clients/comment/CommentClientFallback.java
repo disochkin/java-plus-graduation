@@ -3,7 +3,6 @@ package ru.practicum.ewm.clients.comment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-
 import java.util.List;
 import java.util.Map;
 

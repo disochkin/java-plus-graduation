@@ -22,10 +22,10 @@ public interface EventService {
 
     List<EventShortDto> publicSearchEvents(EventPublicFilter eventPublicFilter, PageRequestDto pageRequestDto);
 
-  //  List<ParticipationRequestDto> checkUserEventParticipation(Long userId, Long eventId);
+    //  List<ParticipationRequestDto> checkUserEventParticipation(Long userId, Long eventId);
 
-  //  EventRequestStatusUpdateResult changeStatusRequest(Long userId, Long eventId,
-  //                                                     EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
+    //  EventRequestStatusUpdateResult changeStatusRequest(Long userId, Long eventId,
+    //                                                     EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
     EventFullDto getEvent(Long eventId);
 

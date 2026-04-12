@@ -2,8 +2,6 @@ package ru.practicum.ewm.clients.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.ewm.clients.event.EventClient;
-import ru.practicum.ewm.dto.event.EventClientDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 
 import java.util.List;

@@ -157,7 +157,7 @@ public class CommentServiceImpl implements CommentService {
                 .toList();
     }
 
-    public  Map<Long, Long> countCommentForEvents(List<Long> eventIds) {
+    public Map<Long, Long> countCommentForEvents(List<Long> eventIds) {
         log.debug("Count comments request for eventIds = {}", eventIds);
         return commentRepository.countByEventIdIn(eventIds).stream()
                 .collect(Collectors.toMap(

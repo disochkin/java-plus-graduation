@@ -1,6 +1,5 @@
 package ru.practicum.ewm.service;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.CommentParam;
 
