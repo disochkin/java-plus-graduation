@@ -1,6 +1,15 @@
 server:
   port: 8080
 
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info
+
 spring:
   cloud:
     gateway:
@@ -8,12 +17,34 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: main_service_route
-          uri: lb://main-service
+        - id: request_service_route
+          uri: lb://request-service
           predicates:
-            - Path=/admin/**, /compilations/**, /users/**, /events/**, /categories/**
+            - Path=/users/*/requests/**, /users/*/events/*/requests, /int/requests/**
+
+        - id: event_service_route
+          uri: lb://event-service
+          predicates:
+            - Path=/int/events/**, /users/*/events/**, /admin/categories/**, /admin/compilations/**, /compilations/**, /events/**, /categories/**, /admin/events/**
 
         - id: stats_service_route
           uri: lb://stats-service
           predicates:
             - Path=/hit/**, /stats/**
+
+        - id: user_service_route
+          uri: lb://user-service
+          predicates:
+            - Path=/admin/users/**, /int/admin/users/**
+
+        - id: comment_service_route
+          uri: lb://comment-service
+          predicates:
+            - Path=/admin/comments/**,/users/*/comments/**,/users/*/events/*/comments/**,/events/*/comments/**,/int/comments
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG
