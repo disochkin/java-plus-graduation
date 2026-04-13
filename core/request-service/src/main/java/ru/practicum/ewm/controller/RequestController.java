@@ -70,18 +70,4 @@ public class RequestController {
         log.info("external query getConfirmedRequest eventsIds - {}", eventIds);
         return requestService.getConfirmedRequest(eventIds);
     }
-
-//    @GetMapping("/requests/{eventId}/participation/{userId}")
-//    public ParticipationRequestDto checkUserEventParticipationPriv(@PathVariable @Positive Long eventId,
-//                                                                   @PathVariable @Positive Long userId) {
-//        log.info("external query checkUserEventParticipation /int/requests/{}/participation/{}", eventId, userId);
-//        return requestService.getUserEventRequests(eventId, userId);
-//    }
-
-//    @GetMapping("/int/requests/{eventId}/participation/{userId}")
-//    public ParticipationRequestDto checkUserEventParticipation(@PathVariable @Positive Long eventId,
-//                                                               @PathVariable @Positive Long userId) {
-//        log.info("internal query checkUserEventParticipation /int/requests/{}/participation/{}", eventId, userId);
-//        return requestService.getEventParticipants(eventId, userId);
-//    }
 }

@@ -15,7 +15,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     List<Request> findByEventId(Long eventId);
 
-    //
     List<Request> findByEventIdAndStatus(Long eventId, RequestStatus status);
 
     Optional<Request> findByRequesterIdAndEventId(Long requesterId, Long eventId);
@@ -28,10 +27,5 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             "GROUP BY r.eventId")
     List<Object[]> countConfirmedRequestsByEventIds(@Param("eventIds") List<Long> eventIds);
 
-    //
     List<Request> findByIdInAndEventId(List<Long> ids, Long eventId);
-//
-//    List<Request> findByEventIdAndRequesterId(Long eventId, Long requesterId);
-//
-//    List<Request> findAllByIdInOrderByCreated(List<Long> requestIds);
 }
