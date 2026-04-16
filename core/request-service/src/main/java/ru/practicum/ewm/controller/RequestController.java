@@ -11,6 +11,7 @@ import ru.practicum.ewm.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.dto.request.RequestDto;
+import ru.practicum.ewm.repository.RequestRepository;
 import ru.practicum.ewm.service.RequestService;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Map;
 @Validated
 public class RequestController {
     private final RequestService requestService;
+    private final RequestRepository requestRepository;
 
     @GetMapping("/users/{userId}/requests")
     public List<RequestDto> getUserRequests(@PathVariable @Positive Long userId) {
@@ -70,4 +72,11 @@ public class RequestController {
         log.info("external query getConfirmedRequest eventsIds - {}", eventIds);
         return requestService.getConfirmedRequest(eventIds);
     }
+
+    @GetMapping("/user/{userId}/event/{eventId}/confirmed")
+    public Boolean hasUserConfirmedRequest(@PathVariable Long userId, @PathVariable Long eventId) {
+        return requestRepository.existsByRequesterIdAndEventIdAndStatus(
+                userId, eventId, RequestStatus.CONFIRMED);
+    }
+
 }

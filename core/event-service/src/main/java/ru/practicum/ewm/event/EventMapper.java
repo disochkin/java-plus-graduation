@@ -19,6 +19,7 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     @Mapping(target = "category", source = "newEventDto.category", qualifiedByName = "categoryFromId")
     Event toEvent(NewEventDto newEventDto, UserClientDto userClientDto);
 
@@ -44,6 +45,7 @@ public interface EventMapper {
     Location toLocation(LocationDto locationDto);
 
     @Mapping(target = "category", source = "category")
+    @Mapping(target = "rating", ignore = true)
     EventClientDto toEventClientDto(Event event);
 }
 

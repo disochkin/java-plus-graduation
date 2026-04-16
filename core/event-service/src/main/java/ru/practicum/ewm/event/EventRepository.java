@@ -2,8 +2,8 @@ package ru.practicum.ewm.event;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import ru.practicum.ewm.dto.event.EventState;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.event.EventState;
 
 import java.util.Collection;
 import java.util.Optional;

@@ -1,10 +1,8 @@
 package ru.practicum.ewm.model.event;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import ru.practicum.ewm.dto.event.EventState;
 import ru.practicum.ewm.model.category.Category;
 
 import java.time.LocalDateTime;
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@Builder
 @EqualsAndHashCode
 public class Event {
     @Id
@@ -54,6 +53,10 @@ public class Event {
 
     @Column(name = "request_moderation")
     private Boolean requestModeration;
+
+    @Column(name = "rating", nullable = false)
+    @Builder.Default
+    private Double rating = 0.0;
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)

@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.practicum.ewm.model.category.Category;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.event.EventState;
 import ru.practicum.ewm.model.event.Location;
 import ru.practicum.ewm.model.event.StateAction;
 

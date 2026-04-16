@@ -2,9 +2,11 @@ package ru.practicum.ewm.event;
 
 import org.springframework.data.domain.Pageable;
 import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface EventService {
     EventFullDto create(Long userId, NewEventDto newEventDto);
@@ -22,12 +24,11 @@ public interface EventService {
 
     List<EventShortDto> publicSearchEvents(EventPublicFilter eventPublicFilter, PageRequestDto pageRequestDto);
 
-    //  List<ParticipationRequestDto> checkUserEventParticipation(Long userId, Long eventId);
-
-    //  EventRequestStatusUpdateResult changeStatusRequest(Long userId, Long eventId,
-    //                                                     EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
-
     EventFullDto getEvent(Long eventId);
 
     EventClientDto getEventInt(Long eventId);
+
+    Stream<RecommendedEventProto> getRecommendations(Long userId, int maxResults);
+
+    void likeEvent(Long userId, Long eventId);
 }
