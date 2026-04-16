@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS stats_analyzer.user_actions (
     timestamp_action TIMESTAMP NOT NULL
 );
 
-CREATE TABLE stats_analyzer.event_similarities (
+CREATE TABLE IF NOT EXISTS stats_analyzer.event_similarities (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     event_a BIGINT NOT NULL,
     event_b BIGINT NOT NULL,
