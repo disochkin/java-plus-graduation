@@ -26,3 +26,22 @@ logging:
     root: INFO
     ru.practicum.ewm: DEBUG
     org.zalando.logbook: TRACE
+
+stats-server:
+  url: http://localhost:9090
+
+grpc:
+  server:
+    port: -1
+  client:
+    collector:
+      address: discovery:///collector
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+    analyzer:
+      address: discovery:///analyzer
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext

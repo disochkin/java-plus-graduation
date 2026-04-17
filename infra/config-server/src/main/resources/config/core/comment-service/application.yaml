@@ -25,3 +25,6 @@ logging:
   level:
     root: INFO
     org.zalando.logbook: TRACE
+grpc:
+  server:
+    port: -1
