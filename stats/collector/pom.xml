@@ -89,7 +89,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <mainClass>ru.practicum.CollectorApplication</mainClass>
+                    <mainClass>ru.practicum.CollectorApp</mainClass>
                 </configuration>
                 <executions>
                     <execution>
