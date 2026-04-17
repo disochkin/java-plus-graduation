@@ -1,6 +1,6 @@
 package ru.practicum.ewm.event;
 
-import ru.practicum.ewm.model.event.EventState;
+import ru.practicum.ewm.dto.event.EventState;
 import ru.practicum.ewm.model.event.StateAction;
 
 public class StateTransitionValidator {

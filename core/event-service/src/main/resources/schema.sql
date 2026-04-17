@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS events (
     published_on TIMESTAMP,
     request_moderation BOOLEAN NOT NULL DEFAULT TRUE,
     state VARCHAR(9) NOT NULL,
-    title VARCHAR(120) NOT NULL
+    title VARCHAR(120) NOT NULL,
+    rating DOUBLE PRECISION NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS event_category_idx ON events(category_id);

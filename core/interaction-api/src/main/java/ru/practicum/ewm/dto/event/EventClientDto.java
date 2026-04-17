@@ -31,6 +31,8 @@ public class EventClientDto {
 
     private Boolean requestModeration;
 
+    private Double rating;
+
     private EventState state = EventState.PENDING;
 
     private String title;

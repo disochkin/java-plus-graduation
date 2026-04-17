@@ -1,9 +1,11 @@
 package ru.practicum.ewm.service;
 
+import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.CollectorClient;
 import ru.practicum.ewm.clients.event.EventLookupFacade;
 import ru.practicum.ewm.clients.user.UserLookupFacade;
 import ru.practicum.ewm.dto.event.EventClientDto;
@@ -15,7 +17,10 @@ import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.repository.RequestRepository;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
+import ru.practicum.ewm.stats.proto.UserActionProto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +36,7 @@ public class RequestServiceImpl implements RequestService {
     private final UserLookupFacade userLookupFacade;
     private final RequestMapper requestMapper;
     private final EventLookupFacade eventLookupFacade;
+    private final CollectorClient collectorClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -77,6 +83,8 @@ public class RequestServiceImpl implements RequestService {
         } else {
             request.setStatus(RequestStatus.PENDING);
         }
+
+        sendRegisterAction(userId, eventId);
 
         Request savedRequest = requestRepository.save(request);
         log.info("Request created: {}", savedRequest);
@@ -212,4 +220,25 @@ public class RequestServiceImpl implements RequestService {
 
         return result;
     }
+
+
+    private void sendRegisterAction(Long userId, Long eventId) {
+        try {
+            UserActionProto action = UserActionProto.newBuilder()
+                    .setUserId(userId)
+                    .setEventId(eventId)
+                    .setActionType(ActionTypeProto.REGISTER)
+                    .setTimestamp(Timestamp.newBuilder()
+                            .setSeconds(Instant.now().getEpochSecond())
+                            .setNanos(Instant.now().getNano())
+                            .build())
+                    .build();
+
+            collectorClient.sendUserAction(action);
+            log.debug("Send register event to Collector: userId={}, eventId={}", userId, eventId);
+        } catch (Exception e) {
+            log.error("ERROR register event to Collector: {}", e.getMessage(), e);
+        }
+    }
+
 }

@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @ConfigurationPropertiesScan
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "ru.practicum")
 @EnableFeignClients(basePackages = "ru.practicum.ewm.clients")
 public class EventApplication {
     public static void main(String[] args) {

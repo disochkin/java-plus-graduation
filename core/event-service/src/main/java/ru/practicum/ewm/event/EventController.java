@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.stat.EndpointHitDto;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @AllArgsConstructor
@@ -21,14 +23,6 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
     private final StatClient statClient;
-
-    private void saveHit(HttpServletRequest request) {
-        statClient.hit(new EndpointHitDto(
-                "ewm-service",
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now()));
-    }
 
     @PostMapping("/users/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
@@ -96,16 +90,15 @@ public class EventController {
         log.info("Public query of events with parameters: {}", eventPublicFilter);
         log.debug("Request parameters: {}", eventPublicFilter);
         log.info("client ip: {}", request.getRemoteAddr());
-        saveHit(request);
         return eventService.publicSearchEvents(eventPublicFilter, pageRequestDto);
     }
 
     @GetMapping("/events/{eventId}")
     public EventFullDto getEvent(@PathVariable Long eventId,
+                                 @RequestHeader("X-EWM-USER-ID") Long userId,
                                  HttpServletRequest request) {
         log.info("Public request for detailed information on the event with id: {}", eventId);
         log.info("client ip: {}", request.getRemoteAddr());
-        saveHit(request);
         return eventService.getEvent(eventId);
     }
 
@@ -113,7 +106,23 @@ public class EventController {
     public EventClientDto getEventInt(@PathVariable Long eventId,
                                       HttpServletRequest request) {
         log.info("Internal request for detailed information on the event with id: {}", eventId);
-        saveHit(request);
         return eventService.getEventInt(eventId);
+    }
+
+    @PutMapping("/{eventId}/like")
+    @ResponseStatus(HttpStatus.OK)
+    public void likeEvent(
+            @PathVariable Long eventId,
+            @RequestHeader("X-EWM-USER-ID") Long userId) {
+
+        eventService.likeEvent(userId, eventId);
+    }
+
+    @GetMapping("/recommendations")
+    public Stream<RecommendedEventProto> getRecommendations(
+            @RequestHeader("X-EWM-USER-ID") Long userId,
+            @RequestParam(defaultValue = "10") int maxResults) {
+
+        return eventService.getRecommendations(userId, maxResults);
     }
 }

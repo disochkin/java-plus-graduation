@@ -1,13 +1,18 @@
 package ru.practicum.ewm.event;
 
+import com.google.protobuf.Timestamp;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.AnalyzerClient;
+import ru.practicum.client.CollectorClient;
 import ru.practicum.ewm.clients.comment.CommentClient;
+import ru.practicum.ewm.clients.event.EventLookupFacade;
 import ru.practicum.ewm.clients.request.RequestClient;
 import ru.practicum.ewm.clients.stat.StatClient;
 import ru.practicum.ewm.clients.user.UserLookupFacade;
@@ -21,16 +26,22 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.model.category.Category;
 import ru.practicum.ewm.model.event.Event;
-import ru.practicum.ewm.model.event.EventState;
 import ru.practicum.ewm.model.event.Location;
 import ru.practicum.ewm.repository.CategoryRepository;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
+import ru.practicum.ewm.stats.proto.UserActionProto;
+import ru.practicum.ewm.stats.proto.UserPredictionsRequestProto;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class EventServiceImpl implements EventService {
@@ -41,6 +52,10 @@ public class EventServiceImpl implements EventService {
     private final CommentClient commentClient;
     private final UserLookupFacade userLookupFacade;
     private final RequestClient requestClient;
+    private final AnalyzerClient analyzerClient;
+    private final EventLookupFacade eventLookupFacade;
+    private final CollectorClient collectorClient;
+
 
     private Map<Long, Long> getViews(List<Event> events) {
         if (events == null || events.isEmpty()) {
@@ -52,7 +67,6 @@ public class EventServiceImpl implements EventService {
                 .toList();
 
         StatsParamDto statsParamDto = new StatsParamDto();
-        // Используем более узкий временной диапазон (не забыть)
         statsParamDto.setStart(LocalDateTime.now().minusHours(1));
         statsParamDto.setEnd(LocalDateTime.now().plusHours(1));
         statsParamDto.setUris(uriList);
@@ -324,6 +338,56 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException(String.format("Event id=%s not found", eventId)));
 
         return eventMapper.toEventClientDto(event);
+    }
+
+
+    @Override
+    public Stream<RecommendedEventProto> getRecommendations(Long userId, int maxResults) {
+        log.info("Получение рекомендаций для пользователя userId={}, maxResults={}", userId, maxResults);
+
+        UserPredictionsRequestProto request = UserPredictionsRequestProto.newBuilder()
+                .setUserId(userId)
+                .setMaxResults(maxResults)
+                .build();
+
+        return analyzerClient.getRecommendationsForUser(request);
+    }
+
+    @Override
+    @Transactional
+    public void likeEvent(Long userId, Long eventId) {
+        log.info("Лайк события eventId={} от пользователя userId={}", eventId, userId);
+
+        EventClientDto eventClientDto = eventLookupFacade.findOrThrow(eventId);
+
+        if (eventClientDto.getState() != EventState.PUBLISHED) {
+            throw new ValidationException("Нельзя лайкнуть неопубликованное событие");
+        }
+
+        if (!hasUserVisitedEvent(userId, eventId)) {
+            throw new ValidationException("Нельзя лайкнуть непосещенное мероприятие");
+        }
+
+        UserActionProto action = UserActionProto.newBuilder()
+                .setUserId(userId)
+                .setEventId(eventId)
+                .setActionType(ActionTypeProto.LIKE)
+                .setTimestamp(Timestamp.newBuilder()
+                        .setSeconds(Instant.now().getEpochSecond())
+                        .setNanos(Instant.now().getNano())
+                        .build())
+                .build();
+
+        collectorClient.sendUserAction(action);
+    }
+
+    private boolean hasUserVisitedEvent(Long userId, Long eventId) {
+        try {
+            return requestClient.hasUserConfirmedRequest(userId, eventId);
+        } catch (Exception e) {
+            log.warn("Не удалось проверить посещение события", e);
+            return false;
+        }
     }
 
 }

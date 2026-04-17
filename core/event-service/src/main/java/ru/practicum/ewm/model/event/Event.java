@@ -1,19 +1,23 @@
 package ru.practicum.ewm.model.event;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import ru.practicum.ewm.dto.event.EventState;
 import ru.practicum.ewm.model.category.Category;
 
 import java.time.LocalDateTime;
+
+import static ru.practicum.ewm.dto.event.EventState.PENDING;
 
 @Entity
 @Table(name = "events")
 @Getter
 @Setter
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 public class Event {
     @Id
@@ -28,8 +32,9 @@ public class Event {
     @ToString.Exclude
     private Category category;
 
-    @Column(name = "created_on")
-    private LocalDateTime createdOn = LocalDateTime.now();
+    @Column(name = "created_on", nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdOn;
 
     @Column(name = "description", length = 7000)
     private String description;
@@ -55,9 +60,13 @@ public class Event {
     @Column(name = "request_moderation")
     private Boolean requestModeration;
 
-    @Column(name = "state")
+    @Column(name = "rating", nullable = false)
+    @Builder.Default
+    private Double rating = 0.0;
+
+    @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EventState state = EventState.PENDING;
+    private EventState state = PENDING;
 
     @Column(name = "title")
     private String title;
