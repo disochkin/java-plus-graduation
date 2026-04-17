@@ -1,4 +1,4 @@
-package ru.practicum.ewm.controller;
+package ru.practicum.controller;
 
 import com.google.protobuf.Empty;
 import io.grpc.Status;
@@ -6,9 +6,9 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import ru.practicum.ewm.processor.UserActionProcessor;
 import ru.practicum.ewm.stats.proto.UserActionControllerGrpc;
 import ru.practicum.ewm.stats.proto.UserActionProto;
+import ru.practicum.processor.UserActionProcessor;
 
 @Slf4j
 @GrpcService

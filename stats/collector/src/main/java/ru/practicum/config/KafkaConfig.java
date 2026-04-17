@@ -1,4 +1,4 @@
-package ru.practicum.ewm.kafka;
+package ru.practicum.config;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import ru.practicum.ewm.serializer.AvroSerializer;
+import ru.practicum.serializer.AvroSerializer;
 
 import java.time.Duration;
 import java.util.HashMap;

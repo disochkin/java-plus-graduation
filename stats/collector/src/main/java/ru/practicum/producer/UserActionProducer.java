@@ -1,4 +1,4 @@
-package ru.practicum.ewm.producer;
+package ru.practicum.producer;
 
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Component;
-import ru.practicum.ewm.kafka.KafkaClient;
+import ru.practicum.config.KafkaClient;
 import ru.practicum.ewm.stats.avro.UserActionAvro;
 
 import java.time.Duration;

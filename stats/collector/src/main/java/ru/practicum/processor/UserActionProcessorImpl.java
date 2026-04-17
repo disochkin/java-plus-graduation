@@ -1,12 +1,12 @@
-package ru.practicum.ewm.processor;
+package ru.practicum.processor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.mapper.UserActionMapper;
-import ru.practicum.ewm.producer.UserActionProducer;
 import ru.practicum.ewm.stats.avro.UserActionAvro;
 import ru.practicum.ewm.stats.proto.UserActionProto;
+import ru.practicum.mapper.UserActionMapper;
+import ru.practicum.producer.UserActionProducer;
 
 @Slf4j
 @Service

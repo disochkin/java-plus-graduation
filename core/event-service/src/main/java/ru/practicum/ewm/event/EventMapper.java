@@ -18,7 +18,7 @@ public interface EventMapper {
     @Mapping(target = "location", source = "newEventDto.location")
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
-    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "state", expression = "java(ru.practicum.ewm.dto.event.EventState.PENDING)")
     @Mapping(target = "rating", ignore = true)
     @Mapping(target = "category", source = "newEventDto.category", qualifiedByName = "categoryFromId")
     Event toEvent(NewEventDto newEventDto, UserClientDto userClientDto);
@@ -37,7 +37,7 @@ public interface EventMapper {
     EventShortDto toShortDto(Event event, Long requests, Long views, Long comments);
 
     @Mapping(target = "confirmedRequests", source = "requests")
-    @Mapping(target = "views", source = "views")
+    //  @Mapping(target = "views", source = "views")
     @Mapping(target = "location", source = "event.location")
     @Mapping(target = "comments", source = "comments")
     EventFullDto toFullDto(Event event, Long requests, Long views, Long comments);

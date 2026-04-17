@@ -1,4 +1,4 @@
-package ru.practicum.ewm.processor;
+package ru.practicum.processor;
 
 import ru.practicum.ewm.stats.proto.UserActionProto;
 
